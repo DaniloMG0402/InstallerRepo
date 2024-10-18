@@ -1,0 +1,31 @@
+# Função para verificar se o Rapid7 está instalado
+function Is-Rapid7Installed {
+    $installed = Get-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*" | 
+                 Where-Object { $_.DisplayName -like "*Rapid7*" }
+
+    if ($installed) {
+        return $true
+    } else {
+        return $false
+    }
+}
+
+# Verificar se o Rapid7 já está instalado
+if (Is-Rapid7Installed) {
+    Write-Host "Rapid7 já está instalado. Não será necessário instalar novamente."
+} else {
+    # URL de download direto do OneDrive
+    $downloadUrl = "https://ck1aeq.dm.files.1drv.com/y4mw4QN-mz2Wg-eMYqmhSvyE4MvT5jJR-Q1YzKIEGvYBnWat-8MKrx0uMI7gbunMo0Wo_v8z9wKGX7_MdHjRFS0gIXBLv0AkLvx26p6ktXL9v-1DWZ6qCHD3vaQvJ2JDnDjXe-quh0cnVSt5-h5vPJDBaolMziyGSTCBD2KWlFVATGqyHcCTIz7Q87sOibLH1Qe?AVOverride=1"
+
+    # Caminho de destino para salvar o arquivo baixado
+    $output = "C:\ProgramData\agentInstaller-x86_64.msi"
+
+    # Faz o download do arquivo
+    Invoke-WebRequest -Uri $downloadUrl -OutFile $output
+
+    # Instala o arquivo MSI baixado
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", $output, "/quiet", "/norestart" -Wait
+
+    # Mensagem de conclusão
+    Write-Host "Instalação concluída com sucesso."
+}
